@@ -1,9 +1,7 @@
 package org.highscreen.utility;
 
-import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Vector;
 
 public class Extractor {
@@ -34,11 +32,11 @@ public class Extractor {
 		}
 	}
 
-	private int readLEInt() throws IOException {
+	private int readLEInt() throws Exception {
 		return Integer.reverseBytes(image.readInt());
 	}
 
-	private String readMD5() throws IOException {
+	private String readMD5() throws Exception {
 		byte[] md5 = new byte[16];
 		String result = "";
 		image.read(md5);
@@ -48,20 +46,18 @@ public class Extractor {
 		return result;
 	}
 
-	private static String getMD5Checksum(byte[] data) {
+	private static String getMD5Checksum(byte[] data) throws Exception {
 		MessageDigest chk;
 		String result = "";
-		try {
-			chk = MessageDigest.getInstance("MD5");
 
-			chk.update(data);
-			byte[] digest = chk.digest();
-			for (byte b : digest) {
-				result += Integer.toString((b & 0xff) + 0x100, 16).substring(1);
-			}
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
+		chk = MessageDigest.getInstance("MD5");
+
+		chk.update(data);
+		byte[] digest = chk.digest();
+		for (byte b : digest) {
+			result += Integer.toString((b & 0xff) + 0x100, 16).substring(1);
 		}
+
 		return result;
 	}
 
@@ -79,7 +75,8 @@ public class Extractor {
 		return data;
 	}
 
-	public void writeChunkToFile(byte[] data, String filename) throws Exception {
+	public void writeChunkToFile(byte[] data, String name) throws Exception {
+		String filename = name+".bin";
 		RandomAccessFile file = new RandomAccessFile(filename, "rw");
 		file.write(data);
 		System.out.println("Chunk extracted successfully: check " + filename);
