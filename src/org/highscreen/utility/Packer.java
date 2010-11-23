@@ -37,17 +37,21 @@ public class Packer {
 	public void makeImage() {
 		try {
 			readChunks();
-			chunks.get(0).start = headerSize;
-			for (int i = 0; i < chunks.size() - 1; i++) {
-				chunks.get(i + 1).start = chunks.get(i).size
-						+ chunks.get(i).start;
-			}
+			calculateChunkBounds();
 			writeHeader();
 			for (ChunkInfo chunk : chunks) {
 				chunk.writeDataToImage(image);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+
+	private void calculateChunkBounds() {
+		chunks.get(0).start = headerSize;
+		for (int i = 0; i < chunks.size() - 1; i++) {
+			chunks.get(i + 1).start = chunks.get(i).size
+					+ chunks.get(i).start;
 		}
 	}
 

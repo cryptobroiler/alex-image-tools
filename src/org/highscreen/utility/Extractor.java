@@ -65,7 +65,7 @@ public class Extractor {
 	}
 
 	public static void main(String[] args) {
-		if (args.length > 0) {
+		if (args.length == 2) {
 			if (args[0].equals("pack")) {
 
 				Packer packer = new Packer(args[1]);
