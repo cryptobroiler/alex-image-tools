@@ -7,7 +7,7 @@ import java.util.Vector;
 public class Extractor {
 	private int sections;
 
-	private Vector<ChunkInfo> chunks;
+	private Vector<ChunkInfo> chunks = new Vector<ChunkInfo>();
 	private String[] chunkNames = { "bootloader", "kernel", "system", "data",
 			"package", "recovery", "cache" };
 	private static RandomAccessFile image;
@@ -23,9 +23,7 @@ public class Extractor {
 	}
 
 	private void readHeader() throws Exception {
-
 		sections = readLEInt();
-		chunks = new Vector<ChunkInfo>();
 		for (int i = 0; i < sections; i++) {
 			chunks.add(new ChunkInfo(readLEInt(), readLEInt(), readMD5(),
 					chunkNames[i]));
@@ -61,34 +59,12 @@ public class Extractor {
 		return result;
 	}
 
-	public byte[] readChunk(ChunkInfo info) throws Exception {
-		byte[] data = new byte[info.size];
-		image.seek(info.start);
-		image.read(data);
-		if (!getMD5Checksum(data).equals(info.hash)) {
-			throw new Exception("Broken image!");
-		}
-		System.out.println("Chunk " + info.name + "("
-				+ Integer.toHexString(info.start) + " to "
-				+ Integer.toHexString(info.start + info.size)
-				+ ") read successfully");
-		return data;
-	}
-
-	public void writeChunkToFile(byte[] data, String name) throws Exception {
-		String filename = name+".bin";
-		RandomAccessFile file = new RandomAccessFile(filename, "rw");
-		file.write(data);
-		System.out.println("Chunk extracted successfully: check " + filename);
-	}
-
 	public void splitImage() {
 		try {
 			for (ChunkInfo c : chunks) {
-				writeChunkToFile(readChunk(c), c.name);
-
+				c.readData(image);
+				c.dumpToFile();
 			}
-
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
