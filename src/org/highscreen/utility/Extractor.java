@@ -8,8 +8,8 @@ public class Extractor {
 	private int sections;
 
 	private Vector<ChunkInfo> chunks = new Vector<ChunkInfo>();
-	private String[] chunkNames = { "bootloader", "kernel", "system", "data",
-			"package", "recovery", "cache" };
+	protected static String[] chunkNames = { "bootloader", "kernel", "system",
+			"data", "package", "recovery", "cache" };
 	private static RandomAccessFile image;
 
 	public Extractor(String fileName) {
@@ -19,7 +19,6 @@ public class Extractor {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	private void readHeader() throws Exception {
@@ -33,6 +32,8 @@ public class Extractor {
 	private int readLEInt() throws Exception {
 		return Integer.reverseBytes(image.readInt());
 	}
+	
+	
 
 	private String readMD5() throws Exception {
 		byte[] md5 = new byte[16];
@@ -44,36 +45,38 @@ public class Extractor {
 		return result;
 	}
 
-	private static String getMD5Checksum(byte[] data) throws Exception {
-		MessageDigest chk;
-		String result = "";
-
-		chk = MessageDigest.getInstance("MD5");
-
-		chk.update(data);
-		byte[] digest = chk.digest();
-		for (byte b : digest) {
-			result += Integer.toString((b & 0xff) + 0x100, 16).substring(1);
-		}
-
-		return result;
-	}
-
 	public void splitImage() {
 		try {
+			System.out.println("Splitting image");
 			for (ChunkInfo c : chunks) {
-				c.readData(image);
-				c.dumpToFile();
+				c.dumpToFileFromImage(image);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void showUsage() {
+		System.out.println("Usage:");
+		System.out
+				.println("tool pack <filename> -- create total.img from bin-files in current dir");
+		System.out
+				.println("tool unpack <filename> -- split total.img to bin-files");
+	}
 
-		Extractor ex = new Extractor(args[0]);
-		ex.splitImage();
+	public static void main(String[] args) {
+		if (args.length > 0) {
+			if (args[0].equals("pack")) {
+
+				Packer packer = new Packer(args[1]);
+				packer.makeImage();
+			} else if (args[0].equals("unpack")) {
+				Extractor ex = new Extractor(args[1]);
+				ex.splitImage();
+			}
+		} else {
+			showUsage();
+		}
 
 	}
 
