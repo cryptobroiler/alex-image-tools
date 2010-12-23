@@ -1,7 +1,6 @@
 package org.highscreen.utility;
 
 import java.io.RandomAccessFile;
-import java.security.MessageDigest;
 import java.util.Vector;
 
 public class Extractor {
@@ -32,8 +31,6 @@ public class Extractor {
 	private int readLEInt() throws Exception {
 		return Integer.reverseBytes(image.readInt());
 	}
-	
-	
 
 	private String readMD5() throws Exception {
 		byte[] md5 = new byte[16];
@@ -73,6 +70,8 @@ public class Extractor {
 			} else if (args[0].equals("unpack")) {
 				Extractor ex = new Extractor(args[1]);
 				ex.splitImage();
+			} else {
+				showUsage();
 			}
 		} else {
 			showUsage();

@@ -3,7 +3,6 @@
  */
 package org.highscreen.utility;
 
-import java.io.FileInputStream;
 import java.io.RandomAccessFile;
 import java.security.MessageDigest;
 
